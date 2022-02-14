@@ -1,0 +1,84 @@
+#ifndef DEFINES_H
+#define DEFINES_H
+
+#include "driver/gpio.h"
+
+//---------------- PINOUT DEFINITIONS ----------------
+#define BLUE_LED_PIN GPIO_NUM_26
+#define YELLOW_LED_PIN GPIO_NUM_25
+#define RED_LED_PIN GPIO_NUM_33
+
+#define RESET_SLAVE_PIN GPIO_NUM_27
+#define ROLE_PIN GPIO_NUM_18
+#define STARTUP_FINISHED_ACK_PIN GPIO_NUM_5
+
+#define CAN_TX_PIN GPIO_NUM_21
+#define CAN_RX_PIN GPIO_NUM_22
+
+#define UART_TX_PIN UART_NUM_2_TXD_DIRECT_GPIO_NUM
+#define UART_RX_PIN UART_NUM_2_RXD_DIRECT_GPIO_NUM
+
+//---------------- TIMING DEFINITIONS ----------------
+#define RESET_SLAVE_DELAY_IN_MILLIS 250
+#define WAIT_FOR_MASTER_TO_BE_CONFIGURED_DELAY_IN_MILLIS 50
+#define LED_BLINK_INTERVAL_DURING_WIFI_CONFIG_IN_MILLIS 250
+#define LAST_UART_TEST_MESSAGE_ARRIVE_DELAY_IN_MILLIS 1000
+#define NEW_CAN_BITRATE_RECEIVED_UART_BUFFER_EMPTYING_DELAY_IN_MILLIS 500
+
+#define CAN_TX_TIMEOUT_IN_MILLIS 1000
+#define CAN_RX_TIMEOUT_IN_MILLIS 1000
+#define NEW_CAN_BITRATE_SENT_DELAY_IN_MILLIS 3000
+
+#define UART_CONNECTION_CHECK_TIMEOUT_IN_MICROS 5000000
+#define UART_CONNECTION_CHECK_DELAY_BETWEEN_FIRST_TX_AND_RX 1
+#define UART_CONNECTION_CHECK_SLAVE_NOT_ANSWERS_DELAY 500
+#define UART_CONNECTION_CHECK_NO_NEW_MESSAGE_FROM_MASTER 100
+#define UART_CONNECTION_CHECK_INITIAL_TX_WAIT_FOR_BUFFER_TO_BE_EMPTY_TIMEOUT 200
+
+//---------------- UART DEFINITIONS ----------------
+#define UART_PORT UART_NUM_2
+#define UART_BAUD_RATE 6000000
+
+#define UART_TX_BUFFER_SIZE 2048
+#define UART_RX_BUFFER_SIZE 2048
+
+#define UART_QUEUE_SIZE 20
+
+//---------------- TASK DEFINITIONS ----------------
+#define CAN_RX_TASK_PRIORITY configMAX_PRIORITIES
+#define CAN_RX_TASK_CORE_NUMBER 1
+#define CAN_RX_TASK_STACK_SIZE_IN_BYTES 2000
+
+#define CAN_TX_TASK_PRIORITY (configMAX_PRIORITIES - 1)
+#define CAN_TX_TASK_CORE_NUMBER 0
+#define CAN_TX_TASK_STACK_SIZE_IN_BYTES 2000
+
+//---------------- WiFi DEFINITIONS ---------------
+#define WIFI_SSID "CAN Attacker"
+#define WIFI_PASSWORD "SneakyPassword123"
+#define WIFI_MAX_STA_CONNECTIONS 4
+
+//------------- Webserver DEFINITIONS -------------
+#define WEBSERVER_NUMBER_OF_MAX_URL_HANDLERS 15
+#define MAX_CONTENT_LENGTH 512
+#define NUMBER_OF_MAXIMUM_PARAMETERS 6
+
+//---------------- LOG DEFINITIONS ----------------
+
+/*
+ * esp_log_level_set() cannot raise log level above the level set using CONFIG_LOG_DEFAULT_LEVEL setting in menuconfig.
+ * However, changing CONFIG_LOG_DEFAULT_LEVEL to debug makes all of the libraries flood the console with infos, while I'm only
+ * interested in my debug logs. Thus the CONFIG_LOG_DEFAULT_LEVEL is set to INFO, and if I want to debug, I can set the log level here.
+ */
+#define LOG_LOCAL_LEVEL ESP_LOG_INFO
+
+#define MAIN_LOG_TAG "Main"
+#define ROLE_SELECTOR_LOG_TAG "RoleSelector"
+#define CAN_HANDLER_LOG_TAG "CANHandler"
+#define UART_HANDLER_LOG_TAG "UARTHandler"
+#define POWER_MANAGER_LOG_TAG "PowerManager"
+#define MESSAGE_ATTACKER_LOG_TAG "MessageAttacker"
+#define WIFI_HANDLER_LOG_TAG "WiFiHandler"
+#define WEBSERVER_LOG_TAG "WebServer"
+
+#endif

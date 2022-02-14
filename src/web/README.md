@@ -1,0 +1,7 @@
+The JS file had to be included inline the html, because ofthe issues listed below. Modify the webpage with care!
+
+I had to find a method where I can upload files to the ESP32. It has 4MB of flash memory which can be utilized using SPIFFS.
+However, I cannot get SPIFFS to work for some reason, because I am unable to upload files to it through ESP-IDF and the arduino framework must use different partitioning because I cannot access those files through ESP-IDF. Due to this issue, I had to embed files into the PROGMEM, which I did using the embed_txtfiles platformio config and inline assemby described here:
+https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html#embedding-binary-data and here:
+https://docs.platformio.org/en/latest/platforms/espressif32.html#embedding-binary-data . The last link is more useful, since platformIO customized the upload process.
+While this way I'm able to embed files into the .rodata section of the elf, the JS file do not get downloaded as a JS file, (there is an encoding issue) and I cannot explain why. I tried charset header, gzipping it, etc, etc, but I always get a "uncaught syntaxerror: invalid or unexpected token ..." at the EOF of the menitoned file, so as the last resort, I'm inline embedding my code to the webpage.

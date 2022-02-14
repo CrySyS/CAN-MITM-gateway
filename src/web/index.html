@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <title>CAN GW Config</title>
+</head>
+<body>
+<nav>
+    CAN Gateway configurator
+</nav>
+
+<div class="container">
+    <form action="/config" method="post">
+        <div class="bitrate">
+            <label>
+                CAN Bus bitrate:
+                <select id="bitrate" name="bitrate">
+                    <option>25kbps</option>
+                    <option>50kbps</option>
+                    <option>100kbps</option>
+                    <option>125kbps</option>
+                    <option selected>250kbps</option>
+                    <option>500kbps</option>
+                    <option>800kbps</option>
+                    <option>1Mbps</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="attackType">
+            <label>
+                Attack type:
+                <select id="attackType" name="attackType">
+                    <option selected>PASSTHROUGH</option>
+                    <option>REPLACE_DATA_WITH_CONSTANT_VALUES</option>
+                    <option>REPLACE_DATA_WITH_RANDOM_VALUES</option>
+                    <option>ADD_DELTA_VALUE_TO_THE_DATA</option>
+                    <option>SUBTRACT_DELTA_VALUE_FROM_THE_DATA</option>
+                    <option>INCREASE_DATA_UNTIL_MAX_VALUE</option>
+                    <option>DECREASE_DATA_UNTIL_MIN_VALUE</option>
+                    <option>REPLACE_DATA_WITH_INCREASING_COUNTER</option>
+                    <option>REPLACE_DATA_WITH_DECREASING_COUNTER</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="configOptions">
+            <div class="d-none configOption" id="idDiv">
+                <label for="id">ID to be attacked:</label>
+                <div class="inputBlock">
+                    0x
+                    <input type="text" placeholder="a1b2c3f4" id="id" name="id">
+                    <button type="button" class="btn-hidden" data-toggle="tooltip" data-placement="left"
+                            title="Must be hexadecimal, at most 8 characters">
+                        <div class="questionmark"></div>
+                    </button>
+                </div>
+            </div>
+            <div class="d-none configOption" id="offsetDiv">
+                <label for="offset">Offset of the data to be modified in bytes:</label>
+                <div class="inputBlock">
+                    <input type="text" placeholder="2" id="offset" name="offset">
+                    <button type="button" class="btn-hidden" data-toggle="tooltip" data-html="true"
+                            data-placement="left"
+                            title="The position of the first byte of the data to be attacked. Must be between 0 and 7. Offset + length must be less or equal than 8. For example if the data section is 0x0001020304050607, then offset 2 would mean that the 0x02 byte is the first one to be attacked.">
+                        <div class="questionmark"></div>
+                    </button>
+                </div>
+            </div>
+            <div class="d-none configOption" id="attackLengthDiv">
+                <label for="attackLength">Length of the attack in bytes:</label>
+                <div class="inputBlock">
+                    <input type="text" placeholder="3" id="attackLength" name="attackLength">
+                    <button type="button" class="btn-hidden" data-toggle="tooltip" data-html="true"
+                            data-placement="left"
+                            title="How many bytes shall we attack? Must be between 1 and 8. Offset + length must be less or equal than 8 For example if the data section is 0x0001020304050607, offset is 2, and length is 3, we would attack the 0x02, 0x03, 0x04 bytes.">
+                        <div class="questionmark"></div>
+                    </button>
+                </div>
+            </div>
+            <div class="d-none configOption" id="byteValueDiv">
+                <label for="byteValue">Value to be inserted/added/subtracted:</label>
+                <div class="inputBlock">
+                    0x
+                    <input type="text" placeholder="ff" id="byteValue" name="byteValue">
+                    <button type="button" class="btn-hidden" data-toggle="tooltip" data-placement="left"
+                            title="Must be hexadecimal, at most 2 characters (1 byte)">
+                        <div class="questionmark"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="formSubmitButtonDiv">
+            <button type="submit" id="formSubmitButton">Submit</button>
+        </div>
+    </form>
+</div><!-- /.container -->
+
+<!-- MAIN JS-->
+<script type="text/javascript">
+    let inputsThatMustBeSet = {
+        id: false,
+        offset: false,
+        attackLength: false,
+        byteValue: false,
+    };
+
+    let inputFormatOkAndHasValue = {
+        id: false,
+        offset: false,
+        attackLength: false,
+        byteValue: false,
+    };
+
+    let offsetAndAttackLengthOutOfBounds = false;
+
+    const idDiv = document.querySelectorAll('#idDiv')[0];
+    const offsetDiv = document.querySelectorAll('#offsetDiv')[0];
+    const attackLengthDiv = document.querySelectorAll('#attackLengthDiv')[0];
+    const byteValueDiv = document.querySelectorAll('#byteValueDiv')[0];
+
+    const attackTypeInputField = document.querySelectorAll('#attackType')[0];
+    const idInputField = document.querySelectorAll('#id')[0];
+    const offsetInputField = document.querySelectorAll('#offset')[0];
+    const attackLengthInputField = document.querySelectorAll('#attackLength')[0];
+    const byteValueInputField = document.querySelectorAll('#byteValue')[0];
+
+    const formSubmitButton = document.querySelectorAll('#formSubmitButton')[0];
+
+    function updateSendButtonStatus() {
+        if (attackTypeInputField.value === "PASSTHROUGH") {
+            formSubmitButton.disabled = false;
+        } else {
+            if ((!inputsThatMustBeSet.id || (inputsThatMustBeSet.id && inputFormatOkAndHasValue.id)) &&
+                (!inputsThatMustBeSet.offset || (inputsThatMustBeSet.offset && inputFormatOkAndHasValue.offset)) &&
+                (!inputsThatMustBeSet.attackLength || (inputsThatMustBeSet.attackLength && inputFormatOkAndHasValue.attackLength)) &&
+                (!inputsThatMustBeSet.byteValue || (inputsThatMustBeSet.byteValue && inputFormatOkAndHasValue.byteValue)) &&
+                !offsetAndAttackLengthOutOfBounds) {
+                formSubmitButton.disabled = false;
+            } else {
+                formSubmitButton.disabled = true;
+            }
+        }
+    }
+
+    function updateInputVisibility() {
+        if (inputsThatMustBeSet.id) {
+            idDiv.classList.add('d-inline-block');
+        } else {
+            idDiv.classList.remove('d-inline-block');
+        }
+
+        if (inputsThatMustBeSet.offset) {
+            offsetDiv.classList.add('d-inline-block');
+        } else {
+            offsetDiv.classList.remove('d-inline-block');
+        }
+
+        if (inputsThatMustBeSet.attackLength) {
+            attackLengthDiv.classList.add('d-inline-block');
+        } else {
+            attackLengthDiv.classList.remove('d-inline-block');
+        }
+
+        if (inputsThatMustBeSet.byteValue) {
+            byteValueDiv.classList.add('d-inline-block');
+        } else {
+            byteValueDiv.classList.remove('d-inline-block');
+        }
+    }
+
+    function checkIfInputIsHexadecimalWithinGivenLength(inputField, maxLength) {
+        if (inputField.value.length <= 0) {
+            return false;
+        } else {
+            const inputValue = inputField.value;
+            let regExp = /^[0-9A-Fa-f]+$/gm;
+
+            if (regExp.test(inputValue)) {
+                if (inputValue.length > 0 && inputValue.length <= maxLength) {
+                    let parsedHex = parseInt(inputValue, 16);
+                    return inputValue.toString().replace(/^0+/, '').toLowerCase() === parsedHex.toString(16).replace(/^0+/, '');
+                }
+            } else {
+                return false;
+            }
+        }
+    }
+
+    function checkIfInputIsDecimalAndWithinGivenValue(inputField, minValue, maxValue) {
+        if (inputField.value.length <= 0) {
+            return false;
+        } else {
+            let inputValue = inputField.value;
+            let regExp = /^[0-9]+$/gm;
+
+            if (regExp.test(inputValue)) {
+                let number = parseInt(inputValue);
+                return (number >= minValue && number <= maxValue);
+            } else {
+                return false;
+            }
+        }
+    }
+
+    function setInputFieldBackgroundColor(inputField, wasTheInputCorrect) {
+        if(inputField.value.length === 0){
+            inputField.style.backgroundColor = "#fcffc6";
+        } else {
+            if (wasTheInputCorrect) {
+                inputField.style.backgroundColor = "#a7fba7";
+            } else {
+                inputField.style.backgroundColor = "#fb5d49";
+            }
+        }
+    }
+
+    function handleOffsetAndAttackLengthBounds() {
+        if (inputFormatOkAndHasValue.offset && inputFormatOkAndHasValue.attackLength) {
+            if (!(parseInt(offsetInputField.value) + parseInt(attackLengthInputField.value) <= 8)) {
+                setInputFieldBackgroundColor(offsetInputField, false);
+                setInputFieldBackgroundColor(attackLengthInputField, false);
+                offsetAndAttackLengthOutOfBounds = true;
+            } else {
+                setInputFieldBackgroundColor(offsetInputField, true);
+                setInputFieldBackgroundColor(attackLengthInputField, true);
+                offsetAndAttackLengthOutOfBounds = false;
+            }
+            return false; //we signal that this function handled the coloring of the input fields
+        }
+        return true; //we signal that this function did not change the coloring, and the caller function has to do it.
+    }
+
+    function updateIDStatus() {
+        inputFormatOkAndHasValue.id = checkIfInputIsHexadecimalWithinGivenLength(idInputField, 8);
+        setInputFieldBackgroundColor(idInputField, inputFormatOkAndHasValue.id);
+        updateSendButtonStatus();
+    };
+
+    function updateOffsetStatus() {
+        inputFormatOkAndHasValue.offset = checkIfInputIsDecimalAndWithinGivenValue(offsetInputField, 0, 7);
+        if (handleOffsetAndAttackLengthBounds()) {
+            setInputFieldBackgroundColor(offsetInputField, inputFormatOkAndHasValue.offset);
+        }
+        updateSendButtonStatus();
+    };
+
+    function updateAttackLengthStatus() {
+        inputFormatOkAndHasValue.attackLength = checkIfInputIsDecimalAndWithinGivenValue(attackLengthInputField, 1, 8);
+        if (handleOffsetAndAttackLengthBounds()) {
+            setInputFieldBackgroundColor(attackLengthInputField, inputFormatOkAndHasValue.attackLength);
+        }
+        updateSendButtonStatus();
+    };
+
+    function updateByteValueStatus() {
+        inputFormatOkAndHasValue.byteValue = checkIfInputIsHexadecimalWithinGivenLength(byteValueInputField, 2);
+        setInputFieldBackgroundColor(byteValueInputField, inputFormatOkAndHasValue.byteValue);
+        updateSendButtonStatus();
+    };
+
+    function updateInputFieldVisibility() {
+        switch (attackTypeInputField.value) {
+            case "PASSTHROUGH":
+                inputsThatMustBeSet = {
+                    id: false,
+                    offset: false,
+                    attackLength: false,
+                    byteValue: false,
+                };
+                break;
+
+            case "REPLACE_DATA_WITH_CONSTANT_VALUES":
+            case "ADD_DELTA_VALUE_TO_THE_DATA":
+            case "SUBTRACT_DELTA_VALUE_FROM_THE_DATA":
+                inputsThatMustBeSet = {
+                    id: true,
+                    offset: true,
+                    attackLength: true,
+                    byteValue: true,
+                };
+                break;
+
+            case "REPLACE_DATA_WITH_RANDOM_VALUES":
+            case "INCREASE_DATA_UNTIL_MAX_VALUE":
+            case "DECREASE_DATA_UNTIL_MIN_VALUE":
+            case "REPLACE_DATA_WITH_INCREASING_COUNTER":
+            case "REPLACE_DATA_WITH_DECREASING_COUNTER":
+                inputsThatMustBeSet = {
+                    id: true,
+                    offset: true,
+                    attackLength: true,
+                    byteValue: false,
+                };
+                break;
+        }
+        updateInputVisibility();
+        updateSendButtonStatus();
+    }
+
+    attackTypeInputField.addEventListener('change', updateInputFieldVisibility, false);
+    idDiv.addEventListener('input', updateIDStatus, false);
+    offsetDiv.addEventListener('input', updateOffsetStatus, false);
+    attackLengthDiv.addEventListener('input', updateAttackLengthStatus, false);
+    byteValueDiv.addEventListener('input', updateByteValueStatus, false);
+
+    window.onpageshow = function (event) {
+        updateIDStatus();
+        updateOffsetStatus();
+        updateAttackLengthStatus();
+        updateByteValueStatus();
+        updateInputFieldVisibility();
+    };
+</script>
+</body>
+</html>

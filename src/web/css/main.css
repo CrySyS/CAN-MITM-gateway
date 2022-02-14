@@ -1,0 +1,192 @@
+:root {
+    --crysys_orange: #fb6602;
+    --crysys_orange-lighter: #ffa235;
+    --grey: #242424;
+    --disabled_grey: #857f84;
+}
+
+body {
+    margin: 0;
+}
+
+nav {
+    padding: 10px 20px;
+    background-color: var(--grey);
+    color: var(--crysys_orange);
+
+    font-weight: bold;
+    font-size: 28px;
+    line-height: 34px;
+}
+
+.container {
+    margin: 10px auto 0 auto;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.d-none {
+    display: none;
+}
+
+.d-inline-block {
+    display: inline-block;
+}
+
+.help {
+    font-weight: bold;
+    font-size: 30px;
+    color: var(--crysys_orange);
+}
+
+.btn-hidden {
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+.btn-hidden:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.tooltip-inner {
+    max-width: 450px;
+}
+
+.attackType, .bitrate {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.attackType select, .bitrate select {
+    padding: 5px;
+}
+
+.configOptions {
+    margin: 0 20px 10px 20px;
+}
+
+.configOption {
+    line-height: 40px;
+    font-size: 18px;
+    width: 100%;
+}
+
+.formSubmitButtonDiv {
+    text-align: right;
+    margin-top: 15px;
+}
+
+.formSubmitButtonDiv button {
+    font-size: 20px;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: var(--crysys_orange);
+    color: var(--grey);
+
+    transition: background-color 0.1s;
+}
+
+.formSubmitButtonDiv button:hover {
+    background-color: var(--crysys_orange-lighter);
+}
+
+.formSubmitButtonDiv button:disabled {
+    background-color: var(--disabled_grey);
+}
+
+.inputBlock {
+    display: inline-block;
+    float: right;
+}
+
+.inputBlock input {
+    font-size: 16px;
+    padding: 5px;
+}
+
+.questionmark:before {
+    content: '?';
+    display: inline-block;
+    font-family: sans-serif;
+    font-weight: bold;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+    line-height: 17px;
+    border-radius: 14px;
+    padding: 1px;
+    color: rgb(245, 111, 26);
+    background: white;
+    border: 1px solid rgb(245, 111, 26);
+    text-decoration: none;
+    transition: background 0.1s, color 0.1s, border 0.1s;
+}
+
+.questionmark:hover:before {
+    color: white;
+    background: rgb(245, 111, 26);
+    border-color: white;
+    text-decoration: none;
+}
+
+
+@media (max-width: 610px) {
+    .inputBlock {
+        display: block;
+        float:none;
+        width: 100%;
+        text-align: right;
+    }
+
+    .inputBlock input {
+        width: 80%;
+        margin-top: 5px;
+        margin-bottom: 15px;
+    }
+
+    .configOption {
+        line-height: 20px;
+    }
+
+    .tooltip-inner {
+        max-width: 150px;
+    }
+}
+
+@media (min-width: 635px) {
+    .container {
+        max-width: 625px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media (pointer: coarse), (hover: none) {
+    [title] {
+        position: relative;
+        display: inline-flex;
+        justify-content: center;
+    }
+
+    [title]:focus::after {
+        content: attr(title);
+        position: absolute;
+        top: 10%;
+        left: -100px;
+        color: #000;
+        background-color: #fff;
+        border: 1px solid;
+        width: fit-content;
+        padding: 3px;
+        z-index: 100;
+    }
+}

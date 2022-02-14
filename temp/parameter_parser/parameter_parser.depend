@@ -1,0 +1,25 @@
+# depslib dependency file v1.0
+1598290158 source:d:\google drive\egyetem\msc\4. félév\dipterv2\kód\parameter_parser\main.cpp
+	<iostream>
+	<string>
+	<regex>
+	"AttackType.h"
+
+1598278828 d:\google drive\egyetem\msc\4. félév\dipterv2\kód\parameter_parser\attacktype.h
+
+1598523507 source:d:\temp\parameter_parser\main.cpp
+	<iostream>
+	<string>
+	<regex>
+	"AttackType.h"
+
+1598278828 d:\temp\parameter_parser\attacktype.h
+
+1599691585 source:f:\git\canhacking\c-implementation\412_nodemcu_esp32s_can_gw_with_attacks_and_wifi_configuration\temp\parameter_parser\main.cpp
+	<iostream>
+	<string>
+	<regex>
+	"AttackType.h"
+
+1599661481 f:\git\canhacking\c-implementation\412_nodemcu_esp32s_can_gw_with_attacks_and_wifi_configuration\temp\parameter_parser\attacktype.h
+
